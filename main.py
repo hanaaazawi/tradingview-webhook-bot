@@ -1,15 +1,15 @@
 from flask import Flask, request, jsonify
 import hmac
 import hashlib
-import requests
 import time
 import base64
 import json
+import requests
 
 app = Flask(__name__)
 
-API_KEY = "DIN_API_NØKKEL"
-API_SECRET = "DITT_API_SECRET"
+API_KEY = "tradingbot"
+API_SECRET = "cxakp_ib9tW9vxAuUXsraPGzv4AJ"
 API_URL = "https://api.crypto.com/v2/private/create-order"
 
 def generate_signature(body, api_secret):
