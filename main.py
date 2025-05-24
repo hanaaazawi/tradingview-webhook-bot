@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
 import hmac
 import hashlib
+import requests
 import time
 import base64
 import json
-import requests
 
 app = Flask(__name__)
 
@@ -21,8 +21,6 @@ def generate_signature(body, api_secret):
         digestmod=hashlib.sha256
     ).hexdigest()
     return tstamp, signature
-    if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
 
 def execute_order(side, symbol, quantity):
     body_json = json.dumps({
@@ -61,3 +59,6 @@ def webhook():
         return jsonify(execute_order("SELL", symbol, quantity))
     else:
         return jsonify({"error": "Invalid signal"}), 400
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
