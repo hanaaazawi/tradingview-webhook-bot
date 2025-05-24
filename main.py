@@ -70,3 +70,33 @@ def send_order(side, symbol, quantity):
     response = requests.post(API_URL, data=body_json, headers=headers)
     print(response.status_code, response.text)
     return response.json()
+  timestamp, signature = generate_signature(body_json, API_SECRET)
+
+  headers = {
+      "Content-Type": "application/json",
+      "API-KEY": API_KEY,
+      "API-TIMESTAMP": timestamp,
+      "API-SIGN": signature
+  }
+
+  response = requests.post(API_URL, headers=headers, data=body_json)
+  return response.json()
+
+
+@app.route("/", methods=["POST"])
+def webhook():
+    data = request.get_json()
+    signal = data.get("signal")
+    symbol = data.get("symbol", "BTC")
+    quantity = data.get("quantity", 0.001)
+
+    if signal == "buy":
+        return execute_order("buy", symbol, quantity)
+    elif signal == "sell":
+        return execute_order("sell", symbol, quantity)
+    else:
+        return {"error": "Ukjent signal"}, 400
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
