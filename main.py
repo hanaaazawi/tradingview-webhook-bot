@@ -34,6 +34,7 @@ def execute_order(side, symbol, quantity):
     })
 
     timestamp, signature = generate_signature(body_json, API_SECRET)
+
     headers = {
         "Content-Type": "application/json",
         "API-KEY": API_KEY,
