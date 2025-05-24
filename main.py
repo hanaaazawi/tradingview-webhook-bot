@@ -31,3 +31,42 @@ def send_order(side, symbol, quantity):
 
     response = requests.post(API_URL, json=body)
     return response.json()
+  }
+  
+  import time
+  import base64
+
+  def generate_signature(body, api_secret):
+    tstamp = str(int(time.time() * 1000))
+    payload = tstamp + "\n" + body
+    signature = hmac.new(
+      bytes(api_secret, encoding='utf-8'),
+      msg=bytes(payload, encoding='utf-8'),
+      digestmod=hashlib.sha256
+    ).hexdigest()
+    return tstamp, signature
+
+  def execute_order(side, symbol, quantity):
+    import json
+    body_json = json.dumps({
+      "method": "private/create-order",
+      "params": {
+        "instrument_name": f"{symbol}_USDT",
+        "side": side,
+        "type": "market",
+        "quantity": quantity
+      },
+      "id": 1
+    })
+
+    tstamp, sig = generate_signature(body_json, API_SECRET)
+    headers = {
+      "Content-Type": "application/json",
+      "API-KEY": API_KEY,
+      "API-TIMESTAMP": tstamp,
+      "API-SIGNATURE": sig
+    }
+
+    response = requests.post(API_URL, data=body_json, headers=headers)
+    print(response.status_code, response.text)
+    return response.json()
